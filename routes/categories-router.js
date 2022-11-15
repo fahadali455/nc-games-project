@@ -1,5 +1,4 @@
 const categoryRouter = require("express").Router();
-const categories = require("../db/data/test-data/categories");
 const { getCategories } = require("../models/categories");
 
 categoryRouter
