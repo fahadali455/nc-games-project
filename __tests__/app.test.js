@@ -3,6 +3,7 @@ const data = require("../db/data/test-data/index");
 const app = require("../app.js");
 const request = require("supertest");
 const db = require("../db/connection");
+require("jest-sorted");
 
 beforeEach(() => seed(data));
 
@@ -39,6 +40,7 @@ describe('Get /api/reviews', () => {
                 const { reviews } = res.body;
                 expect(reviews).toBeInstanceOf(Array);
                 reviews.forEach((review) => {
+
                     expect(review).toEqual(
                         expect.objectContaining({
                             owner: expect.any(String),
@@ -65,10 +67,9 @@ describe('Get /api/reviews', () => {
                 expect(reviews).toBeInstanceOf(Array);
 
                 let reviewId1 = reviews.find(item => item.review_id === 1);
-                
                 expect(reviewId1).toEqual(
                     expect.objectContaining({
-                        comment_count: 0
+                        comment_count: 1
                     })
                 );
 
@@ -88,13 +89,7 @@ describe('Get /api/reviews', () => {
             .expect(200)
             .then( res => {
                 const { reviews } = res.body;
-                let prevDate = new Date();
-                let currentDate;
-                reviews.forEach((review) => {
-                    currentDate = new Date(review.created_at);
-                    expect(prevDate>=currentDate).toBeTruthy();
-                    prevDate = currentDate;
-                });
+                expect(reviews).toBeSortedBy("created_at", {descending: true,});
             });
     });
 });

@@ -1,31 +1,15 @@
 const db = require("../db/connection");
-const { getCommentCount } = require("../utils");
 
 exports.getReviews = () => {
-    let commentCount;
-    return getCommentCount()
-        .then(count => {
-            
-            commentCount = count;
-            
-            return db
-                .query(
-                    `SELECT * FROM reviews
-                    ORDER BY created_at DESC;`
-                );
-            
-        })
-        .then(reviews => {
-            reviews.rows.forEach(review => {
-                if(commentCount[review.review_id]){
-                    review["comment_count"] = Number(commentCount[review.review_id]);
-                }
-                else{
-                    review["comment_count"] = 0;
-                }
-                delete review["review_body"];
-            })
-
-            return reviews.rows;
-        })
+    return db
+    .query(
+        `SELECT reviews.review_id, reviews. owner, reviews.title, reviews.category, reviews.review_img_url, reviews.created_at, reviews.votes, reviews.designer, COUNT(*)::int AS comment_count
+        FROM reviews
+        LEFT JOIN comments
+        ON reviews.review_id = comments.review_id
+        GROUP BY reviews.review_id
+        ORDER BY reviews.created_at DESC;
+        `
+    )
+    .then(reviews => {return reviews.rows})
 }

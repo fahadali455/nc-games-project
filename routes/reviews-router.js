@@ -4,12 +4,7 @@ const { getReviews } = require("../models/reviews");
 reviewsRouter
     .route("/")
     .get((req, res) => {
-        getReviews()
-        .then((reviews) => {
-            res.send({ reviews })
-
-        })
-        .catch(err => { console.log(err)})
+        getReviews().then((reviews) => {res.status(200).send({ reviews })})
     })
 
 
