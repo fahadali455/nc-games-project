@@ -11,8 +11,18 @@ app.all("/*", (req, res) => {
 });
 
 app.use((err, req, res, next) => {
+    //check if error has status and msg as this means it is an error i have created 
+    if(err.status && err.msg){
+        res.status(err.status).send({msg: err.msg});
+    }
+    else{
+        next(err);
+    }
+})
+
+app.use((err, req, res, next) => {
   console.log(err);
-  res.sendStatus(500);
+  res.status(500).send({msg: "server error!"});
 });
 
 module.exports = app;

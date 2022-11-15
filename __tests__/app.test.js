@@ -3,6 +3,7 @@ const data = require("../db/data/test-data/index");
 const app = require("../app.js");
 const request = require("supertest");
 const db = require("../db/connection");
+require("jest-sorted");
 
 beforeEach(() => seed(data));
 
@@ -26,6 +27,69 @@ describe('Get /api/categories', () => {
                         })
                     );
                 });
+            });
+    });
+});
+
+describe('Get /api/reviews', () => {
+    test("200: response with array of all reviews containing all the correct properties", () => {
+        return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then( res => {
+                const { reviews } = res.body;
+                expect(reviews).toBeInstanceOf(Array);
+                reviews.forEach((review) => {
+
+                    expect(review).toEqual(
+                        expect.objectContaining({
+                            owner: expect.any(String),
+                            title: expect.any(String),
+                            review_id: expect.any(Number),
+                            category: expect.any(String),
+                            review_img_url: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            designer: expect.any(String),
+                            comment_count: expect.any(Number)
+                        })
+                    );
+                });
+            });
+    });
+
+    test("200: response with array of all reviews containing correct comment_count", () => {
+        return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then( res => {
+                const { reviews } = res.body;
+                expect(reviews).toBeInstanceOf(Array);
+
+                let reviewId1 = reviews.find(item => item.review_id === 1);
+                expect(reviewId1).toEqual(
+                    expect.objectContaining({
+                        comment_count: 1
+                    })
+                );
+
+                let reviewId2 = reviews.find(item => item.review_id === 2);
+                
+                expect(reviewId2).toEqual(
+                    expect.objectContaining({
+                        comment_count: 3
+                    })
+                );
+            });
+    });
+
+    test("200: response with array of all reviews sorted by date in descending order", () => {
+        return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then( res => {
+                const { reviews } = res.body;
+                expect(reviews).toBeSortedBy("created_at", {descending: true,});
             });
     });
 });
