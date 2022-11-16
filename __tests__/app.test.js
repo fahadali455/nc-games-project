@@ -140,3 +140,72 @@ describe('Get /api/reviews/:review_id', () => {
             });
     });
 });
+
+describe('Get /api/reviews/:review_id/comments', () => {
+    test("200: response with correct array containing reviews", () => {
+        return request(app)
+            .get("/api/reviews/2/comments")
+            .expect(200)
+            .then( res => {
+                const { comments } = res.body;
+                expect(comments).toBeInstanceOf(Array);
+                comments.forEach(comment => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            review_id: 2,
+                        })
+                    );
+                })
+            });
+    });
+
+    test("400: response with 400 bad request error", () => {
+        return request(app)
+            .get("/api/reviews/test/comments")
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toBe("Bad Request!");
+                
+            });
+    });
+
+    test("400: response with 404 resource not found error", () => {
+        return request(app)
+            .get("/api/reviews/99/comments")
+            .expect(404)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toBe("Resource not found.");
+                
+            });
+    });
+
+    test("200: response with empty array when review id exists but no corresponding comments", () => {
+        return request(app)
+            .get("/api/reviews/1/comments")
+            .expect(200)
+            .then( res => {
+                const { comments } = res.body;
+                expect(comments).toEqual([]);
+                
+            });
+    });
+
+    test("200: response with comments array sorted by most recent comments first", () => {
+        return request(app)
+            .get("/api/reviews/3/comments")
+            .expect(200)
+            .then( res => {
+                const { comments } = res.body;
+                expect(comments).toBeSortedBy("created_at", {descending: true});
+                
+            });
+    });
+    
+});

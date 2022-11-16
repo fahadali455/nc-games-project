@@ -33,3 +33,29 @@ exports.getReviewById = (reviewId) => {
         return Promise.reject({ status: 400, msg: "Bad Request!" });
     }
 }
+
+exports.getCommentsByReviewId = (reviewId) => {
+    if(Number.isInteger(Number(reviewId))){
+        return db
+            .query(
+                `SELECT comments.* FROM reviews
+                LEFT JOIN comments
+                ON comments.review_id = reviews.review_id
+                WHERE reviews.review_id = $1
+                ORDER BY comments.created_at DESC;
+                `, [reviewId]
+            )
+            .then(comments => {
+                if(comments.rows.length === 0){
+                    return Promise.reject({status: 404, msg: "Resource not found."})
+                }
+                else if(comments.rows[0].comment_id === null){
+                    return []
+                }
+                return comments.rows
+            })
+    }
+    else{
+        return Promise.reject({ status: 400, msg: "Bad Request!" });
+    }   
+}
