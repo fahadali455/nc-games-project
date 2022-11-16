@@ -93,3 +93,50 @@ describe('Get /api/reviews', () => {
             });
     });
 });
+
+describe('Get /api/reviews/:review_id', () => {
+    test("200: response with correct review object", () => {
+        return request(app)
+            .get("/api/reviews/1")
+            .expect(200)
+            .then( res => {
+                const { review } = res.body;
+                expect(review).toBeInstanceOf(Object);
+                expect(review).toEqual(
+                    expect.objectContaining({
+                        review_id: 1,
+                        title: "Agricola",
+                        review_body: "Farmyard fun!",
+                        designer: "Uwe Rosenberg",
+                        review_img_url: "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+                        votes: 1,
+                        category: "euro game",
+                        owner: "mallionaire",
+                        created_at: "2021-01-18T10:00:20.514Z",
+                    })
+               );
+            });
+    });
+
+    test("400: response with 400 bad request error", () => {
+        return request(app)
+            .get("/api/reviews/test")
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toBe("Bad Request!");
+                
+            });
+    });
+
+    test("400: response with 404 resource not found error", () => {
+        return request(app)
+            .get("/api/reviews/99")
+            .expect(404)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toBe("Resource not found.");
+                
+            });
+    });
+});
