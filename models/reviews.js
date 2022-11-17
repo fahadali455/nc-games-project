@@ -88,3 +88,31 @@ exports.postComment = (reviewId, username, body) => {
         return Promise.reject({ status: 400, msg: "Bad Request!" });
     }
 }
+
+exports.patchVotes = (reviewId, body) => {
+    const votes = body['inc_votes'];
+
+    if(Number.isInteger(Number(reviewId)) && Number.isInteger(Number(votes)) && Object.keys(body).length === 1){
+        return db
+            .query(
+                `UPDATE 
+                    reviews
+                SET 
+                    votes = votes + $1
+                WHERE 
+                    review_id = $2
+                RETURNING *;`
+                ,[votes, reviewId]
+            )
+            .then(review => {
+                if(review.rows.length === 0){
+                    return Promise.reject({status: 404, msg: "Resource not found."})
+                }
+                else{ return review.rows[0] }
+            })
+    }
+    else{
+        return Promise.reject({ status: 400, msg: "Bad Request!" });
+    }
+
+}

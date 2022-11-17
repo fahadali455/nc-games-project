@@ -295,3 +295,108 @@ describe('POST /api/reviews/:review_id/comments', () => {
             });
     });
 });
+
+
+describe('PATCH /api/reviews/:review_id', () => {
+    test("200: response with updated object", () => {
+        const votesInc = {
+            inc_votes: 5,
+        }
+
+        return request(app)
+            .patch("/api/reviews/2")
+            .send(votesInc)
+            .expect(200)
+            .then( res => {
+                const { review } = res.body;
+                expect(review).toMatchObject({
+                    review_id: 2,
+                    title: 'Jenga',
+                    category: 'dexterity',
+                    designer: 'Leslie Scott',
+                    owner: 'philippaclaire9',
+                    review_body: 'Fiddly fun for all the family',
+                    review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                    created_at: expect.any(String),
+                    votes: 10
+                })
+            });
+    });
+
+    test("400: response with bad request error if body missing inc_votes property", () => {
+        const votesInc = {
+            body:"test"
+        }
+        
+        return request(app)
+            .patch("/api/reviews/2/")
+            .send(votesInc)
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Bad Request!")
+            });
+    });
+
+    test("400: response with bad request error if inc_votes property invalid format", () => {
+        const votesInc = {
+            inc_votes:"test"
+        }
+        
+        return request(app)
+            .patch("/api/reviews/2/")
+            .send(votesInc)
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Bad Request!")
+            });
+    });
+
+    test("404: response with not found error if review id does not exist", () => {
+        const votesInc = {
+            inc_votes: 5,
+        }
+        
+        return request(app)
+            .patch("/api/reviews/99")
+            .send(votesInc)
+            .expect(404)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Resource not found.")
+            });
+    });
+
+    test("400: response with bad request error if review id not in corect format", () => {
+        const votesInc = {
+            inc_votes: 5,
+        }
+        
+        return request(app)
+            .patch("/api/reviews/test")
+            .send(votesInc)
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Bad Request!")
+            });
+    });
+
+    test("400: response with bad request error if body contains other properties", () => {
+        const votesInc = {
+            inc_votes: 5,
+            test: "test"
+        }
+        
+        return request(app)
+            .patch("/api/reviews/2")
+            .send(votesInc)
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Bad Request!")
+            });
+    });
+
+});
