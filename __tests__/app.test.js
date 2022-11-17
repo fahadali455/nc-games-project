@@ -163,7 +163,7 @@ describe('Get /api/reviews/:review_id', () => {
             });
     });
 
-    test("200: response with correct comment count of 0 when no reviews found", () => {
+    test("200: response with correct comment count of 0 when no comments found", () => {
         return request(app)
             .get("/api/reviews/1")
             .expect(200)
