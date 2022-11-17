@@ -409,6 +409,7 @@ describe('Get /api/users', () => {
             .then( res => {
                 const { users } = res.body;
                 expect(users).toBeInstanceOf(Array);
+                expect(users.length).toBeGreaterThan(1);
                 users.forEach((user) => {
                     expect(user).toEqual(
                         expect.objectContaining({

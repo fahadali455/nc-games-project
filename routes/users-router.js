@@ -3,10 +3,12 @@ const usersRouter = require("express").Router();
 
 usersRouter
     .route("/")
-    .get((req, res) => {
-        getUsers().then(users => {
+    .get((req, res, next) => {
+        getUsers()
+        .then(users => {
             res.status(200).send({ users })
-        });
+        })
+        .catch(next)
 
     })
 
