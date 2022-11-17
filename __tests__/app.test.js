@@ -297,7 +297,7 @@ describe('POST /api/reviews/:review_id/comments', () => {
 });
 
 
-describe.only('PATCH /api/reviews/:review_id', () => {
+describe('PATCH /api/reviews/:review_id', () => {
     test("200: response with updated object", () => {
         const votesInc = {
             inc_votes: 5,
