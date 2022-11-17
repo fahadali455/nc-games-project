@@ -221,7 +221,6 @@ describe('POST /api/reviews/:review_id/comments', () => {
             .expect(201)
             .then( res => {
                 const { comment } = res.body;
-                expect(comment).toBeInstanceOf(Object);
                 expect(comment).toMatchObject({
                         comment_id: expect.any(Number),
                         review_id: 1,

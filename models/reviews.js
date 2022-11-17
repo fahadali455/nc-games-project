@@ -65,17 +65,17 @@ exports.postComment = (reviewId, username, body) => {
         return db
             .query(
                 `INSERT INTO comments
-                    (votes, created_at, author, body, review_id)
+                    (author, body, review_id)
                 SELECT
-                    0, $1, users.username, $2, reviews.review_id
+                    users.username, $1, reviews.review_id
                 FROM 
                     reviews, users
                 WHERE  
-                    reviews.review_id = $3
+                    reviews.review_id = $2
                 AND
-                    users.username = $4
+                    users.username = $3
                 RETURNING *;`
-                ,[new Date(), body, reviewId, username]
+                ,[body, reviewId, username]
             )
             .then(newComment => {
                 if(newComment.rows.length === 0){
