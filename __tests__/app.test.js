@@ -400,3 +400,24 @@ describe('PATCH /api/reviews/:review_id', () => {
     });
 
 });
+
+describe.only('Get /api/users', () => {
+    test("200: response with array of all the user objects", () => {
+        return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then( res => {
+                const { users } = res.body;
+                expect(users).toBeInstanceOf(Array);
+                users.forEach((user) => {
+                    expect(user).toEqual(
+                        expect.objectContaining({
+                            username: expect.any(String),
+                            name: expect.any(String),
+                            avatar_url: expect.any(String),
+                        })
+                    );
+                });
+            });
+    });
+});
