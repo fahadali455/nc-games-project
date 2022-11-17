@@ -18,9 +18,12 @@ exports.getReviewById = (reviewId) => {
     if(Number.isInteger(Number(reviewId))){
         return db
             .query(
-                `SELECT * FROM reviews
-                WHERE review_id = $1;
-                `, [reviewId]
+                `SELECT reviews.*, COUNT(comments.comment_id)::int AS comment_count FROM reviews
+                LEFT JOIN comments
+                ON reviews.review_id = comments.review_id
+                WHERE reviews.review_id = $1
+                GROUP BY reviews.review_id;`
+                , [reviewId]
             )
             .then(review => {
                 if(review.rows.length === 0){

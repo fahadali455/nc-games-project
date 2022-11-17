@@ -139,6 +139,52 @@ describe('Get /api/reviews/:review_id', () => {
                 
             });
     });
+
+    test("200: response with correct review object and comment count", () => {
+        return request(app)
+            .get("/api/reviews/2")
+            .expect(200)
+            .then( res => {
+                const { review } = res.body;
+                expect(review).toBeInstanceOf(Object);
+                expect(review).toMatchObject({
+                        review_id: 2,
+                        title: 'Jenga',
+                        designer: 'Leslie Scott',
+                        owner: 'philippaclaire9',
+                        review_img_url:
+                        'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                        review_body: 'Fiddly fun for all the family',
+                        category: 'dexterity',
+                        created_at: expect.any(String),
+                        votes: 5,
+                        comment_count: 3
+                    })
+            });
+    });
+
+    test("200: response with correct comment count of 0 when no reviews found", () => {
+        return request(app)
+            .get("/api/reviews/1")
+            .expect(200)
+            .then( res => {
+                const { review } = res.body;
+                expect(review).toBeInstanceOf(Object);
+                expect(review).toMatchObject({
+                        review_id: 1,
+                        title: "Agricola",
+                        review_body: "Farmyard fun!",
+                        designer: "Uwe Rosenberg",
+                        review_img_url: "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+                        votes: 1,
+                        category: "euro game",
+                        owner: "mallionaire",
+                        created_at: "2021-01-18T10:00:20.514Z",
+                        comment_count: 0,
+                    })
+            });
+    });
+
 });
 
 describe('Get /api/reviews/:review_id/comments', () => {
