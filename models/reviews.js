@@ -59,3 +59,32 @@ exports.getCommentsByReviewId = (reviewId) => {
         return Promise.reject({ status: 400, msg: "Bad Request!" });
     }   
 }
+
+exports.postComment = (reviewId, username, body) => {
+    if(Number.isInteger(Number(reviewId)) && username && body){
+        return db
+            .query(
+                `INSERT INTO comments
+                    (author, body, review_id)
+                SELECT
+                    users.username, $1, reviews.review_id
+                FROM 
+                    reviews, users
+                WHERE  
+                    reviews.review_id = $2
+                AND
+                    users.username = $3
+                RETURNING *;`
+                ,[body, reviewId, username]
+            )
+            .then(newComment => {
+                if(newComment.rows.length === 0){
+                    return Promise.reject({status: 404, msg: "Resource not found."})
+                }
+                else{ return newComment.rows[0] }
+            })
+    }
+    else{
+        return Promise.reject({ status: 400, msg: "Bad Request!" });
+    }
+}

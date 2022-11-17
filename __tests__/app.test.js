@@ -150,8 +150,7 @@ describe('Get /api/reviews/:review_id/comments', () => {
                 const { comments } = res.body;
                 expect(comments).toBeInstanceOf(Array);
                 comments.forEach(comment => {
-                    expect(comment).toEqual(
-                        expect.objectContaining({
+                    expect(comment).toMatchObject({
                             comment_id: expect.any(Number),
                             votes: expect.any(Number),
                             created_at: expect.any(String),
@@ -159,7 +158,6 @@ describe('Get /api/reviews/:review_id/comments', () => {
                             body: expect.any(String),
                             review_id: 2,
                         })
-                    );
                 })
             });
     });
@@ -208,4 +206,92 @@ describe('Get /api/reviews/:review_id/comments', () => {
             });
     });
     
+});
+
+describe('POST /api/reviews/:review_id/comments', () => {
+    test("201: response with posted object", () => {
+        const newComment = {
+            username:"mallionaire",
+            body:"test"
+        }
+
+        return request(app)
+            .post("/api/reviews/1/comments")
+            .send(newComment)
+            .expect(201)
+            .then( res => {
+                const { comment } = res.body;
+                expect(comment).toMatchObject({
+                        comment_id: expect.any(Number),
+                        review_id: 1,
+                        author: newComment.username,
+                        body: newComment.body,
+                        votes: 0,
+                        created_at: expect.any(String)  
+                })
+            });
+    });
+
+    test("400: response with bad request error if review id not in correct format", () => {
+        const newComment = {
+            username:"mallionaire",
+            body:"test"
+        }
+        
+        return request(app)
+            .post("/api/reviews/test/comments")
+            .send(newComment)
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Bad Request!")
+            });
+    });
+
+    test("404: response with bad request error if review id in correct format but does not exist", () => {
+        const newComment = {
+            username:"mallionaire",
+            body:"test"
+        }
+        
+        return request(app)
+            .post("/api/reviews/50/comments")
+            .send(newComment)
+            .expect(404)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Resource not found.")
+            });
+    });
+
+    test("404: response with bad request error if username does not exist", () => {
+        const newComment = {
+            username:"test",
+            body:"test"
+        }
+        
+        return request(app)
+            .post("/api/reviews/5/comments")
+            .send(newComment)
+            .expect(404)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Resource not found.")
+            });
+    });
+
+    test("400: response with bad request error if body missing properties", () => {
+        const newComment = {
+            body:"test"
+        }
+        
+        return request(app)
+            .post("/api/reviews/5/comments")
+            .send(newComment)
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Bad Request!")
+            });
+    });
 });

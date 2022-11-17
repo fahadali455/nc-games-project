@@ -1,5 +1,5 @@
 const reviewsRouter = require("express").Router();
-const { getReviews, getReviewById, getCommentsByReviewId } = require("../models/reviews");
+const { getReviews, getReviewById, getCommentsByReviewId, postComment } = require("../models/reviews");
 
 reviewsRouter
     .route("/")
@@ -27,7 +27,20 @@ reviewsRouter
         .then(comments => {
             res.send({ comments })
         })
-        .catch(next)
-    })
+        .catch(next);
+    });
+
+reviewsRouter
+    .route("/:review_id/comments")
+    .post((req, res, next) => {
+        const { review_id } = req.params;
+        const { username, body } = req.body;
+
+        postComment(review_id, username, body)
+        .then(comment => {
+            res.status(201).send({ comment });
+        })
+        .catch(next);
+    });
 
 module.exports = reviewsRouter;
