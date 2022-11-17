@@ -13,7 +13,9 @@ reviewsRouter
         const { review_id } = req.params;
     
         getReviewById(review_id)
-        .then(review => res.send({review}))
+        .then(review => {
+            res.status(200).send({review})
+        })
         .catch(next)
 
     })
