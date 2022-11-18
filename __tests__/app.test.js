@@ -578,3 +578,36 @@ describe('Get /api/users', () => {
             });
     });
 });
+
+describe('DELETE /api/comments/:comment_id', () => {
+    test("204: response with 204 status and no content", () => {
+        return request(app)
+            .delete("/api/comments/1")
+            .expect(204)
+            .then( res => {
+                expect(res.body).toEqual({});
+            });
+    });
+
+    test("400: response with bad request error if review id not integer", () => {
+        
+        return request(app)
+            .delete("/api/comments/test")
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Bad Request!")
+            });
+    });
+
+    test("404: response with not found error if review id not found", () => {
+        
+        return request(app)
+            .delete("/api/comments/99")
+            .expect(404)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toEqual("Resource not found.")
+            });
+    });
+});
