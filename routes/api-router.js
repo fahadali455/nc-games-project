@@ -3,10 +3,10 @@ const categoryRouter = require("./categories-router");
 const commentsRouter = require("./comments-router");
 const reviewRouter = require("./reviews-router");
 const usersRouter = require("./users-router");
+const endpoints = require("../endpoints.json");
 
 apiRouter.get("/", (req, res) => {
-  message = "ALL OK from GET /api";
-  res.status(200).send({ message });
+  res.status(200).send(endpoints);
 });
 
 apiRouter.use("/categories", categoryRouter);
