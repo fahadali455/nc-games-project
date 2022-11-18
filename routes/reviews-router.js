@@ -3,9 +3,14 @@ const { getReviews, getReviewById, getCommentsByReviewId, postComment, patchVote
 
 reviewsRouter
     .route("/")
-    .get((req, res) => {
-        getReviews().then((reviews) => {res.status(200).send({ reviews })})
-    })
+    .get((req, res, next) => {
+        const { category, sort_by, order } = req.query; 
+        getReviews(category, sort_by, order)
+        .then((reviews) => {
+            res.status(200).send({ reviews })
+        })
+        .catch(next);
+    });
 
 reviewsRouter
     .route("/:review_id")

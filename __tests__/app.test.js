@@ -92,6 +92,116 @@ describe('Get /api/reviews', () => {
                 expect(reviews).toBeSortedBy("created_at", {descending: true,});
             });
     });
+
+    test("200: response with array of all reviews of the correct category", () => {
+        return request(app)
+            .get("/api/reviews?category=social deduction&sort_by=created_at&order=ASC")
+            .expect(200)
+            .then( res => {
+                const { reviews } = res.body;
+                expect(reviews).toBeInstanceOf(Array);
+                reviews.forEach((review) => {
+
+                    expect(review).toEqual(
+                        expect.objectContaining({
+                            owner: expect.any(String),
+                            title: expect.any(String),
+                            review_id: expect.any(Number),
+                            category: "social deduction",
+                            review_img_url: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            designer: expect.any(String),
+                            comment_count: expect.any(Number)
+                        })
+                    );
+                });
+                expect(reviews).toBeSortedBy("created_at", {ascending: true,});
+            });
+    });
+
+    test("200: response sorted and ordered by queries passed", () => {
+        return request(app)
+            .get("/api/reviews?category=social deduction&sort_by=review_id&order=ASC")
+            .expect(200)
+            .then( res => {
+                const { reviews } = res.body;
+                expect(reviews).toBeSortedBy("review_id", {ascending: true,});
+            });
+    });
+
+    test("200: response with array of all reviews if category omitted", () => {
+        return request(app)
+            .get("/api/reviews?sort_by=created_at&order=DESC")
+            .expect(200)
+            .then( res => {
+                const { reviews } = res.body;
+                expect(reviews.length).toBe(13)
+                reviews.forEach((review) => {
+
+                    expect(review).toEqual(
+                        expect.objectContaining({
+                            owner: expect.any(String),
+                            title: expect.any(String),
+                            review_id: expect.any(Number),
+                            category: expect.any(String),
+                            review_img_url: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            designer: expect.any(String),
+                            comment_count: expect.any(Number)
+                        })
+                    );
+                });
+
+                expect(reviews).toBeSortedBy("created_at", {descending: true,})
+            });
+    });
+
+    test("404: response with 404 not found error if invalid category", () => {
+        return request(app)
+            .get("/api/reviews?category=test&sort_by=created_at&order=DESC")
+            .expect(404)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toBe("Resource not found.");
+                
+            });
+    });
+
+    test("400: response with 400 bad request error if invalid sort_by", () => {
+        return request(app)
+            .get("/api/reviews?category=social deduction&sort_by=test&order=DESC")
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toBe("Bad Request!");
+                
+            });
+    });
+
+    test("400: response with 400 bad request error if invalid order", () => {
+        return request(app)
+            .get("/api/reviews?category=social deduction&sort_by=created_at&order=test")
+            .expect(400)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toBe("Bad Request!");
+                
+            });
+    });
+
+    test("404: response with 404 resource not found error if valid category but no reviews", () => {
+        return request(app)
+            .get("/api/reviews?category=children's games&sort_by=created_at&order=DESC")
+            .expect(404)
+            .then( res => {
+                const { msg } = res.body;
+                expect(msg).toBe("Resource not found.");
+                
+            });
+    });
+
 });
 
 describe('Get /api/reviews/:review_id', () => {
@@ -163,7 +273,7 @@ describe('Get /api/reviews/:review_id', () => {
             });
     });
 
-    test("200: response with correct comment count of 0 when no reviews found", () => {
+    test("200: response with correct comment count of 0 when no comments found", () => {
         return request(app)
             .get("/api/reviews/1")
             .expect(200)
