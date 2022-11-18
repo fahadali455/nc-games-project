@@ -31,7 +31,7 @@ describe('Get /api/categories', () => {
     });
 });
 
-describe.only('Get /api/reviews', () => {
+describe('Get /api/reviews', () => {
     test("200: response with array of all reviews containing all the correct properties", () => {
         return request(app)
             .get("/api/reviews")
