@@ -31,7 +31,7 @@ describe('Get /api/categories', () => {
     });
 });
 
-describe('Get /api/reviews', () => {
+describe.only('Get /api/reviews', () => {
     test("200: response with array of all reviews containing all the correct properties", () => {
         return request(app)
             .get("/api/reviews")
@@ -95,7 +95,7 @@ describe('Get /api/reviews', () => {
 
     test("200: response with array of all reviews of the correct category", () => {
         return request(app)
-            .get("/api/reviews?category=social-deduction&sort_by=created_at&order=ASC")
+            .get("/api/reviews?category=social deduction&sort_by=created_at&order=ASC")
             .expect(200)
             .then( res => {
                 const { reviews } = res.body;
@@ -122,7 +122,7 @@ describe('Get /api/reviews', () => {
 
     test("200: response sorted and ordered by queries passed", () => {
         return request(app)
-            .get("/api/reviews?category=social-deduction&sort_by=review_id&order=ASC")
+            .get("/api/reviews?category=social deduction&sort_by=review_id&order=ASC")
             .expect(200)
             .then( res => {
                 const { reviews } = res.body;
@@ -136,7 +136,6 @@ describe('Get /api/reviews', () => {
             .expect(200)
             .then( res => {
                 const { reviews } = res.body;
-                expect(reviews).toBeInstanceOf(Array);
                 expect(reviews.length).toBe(13)
                 reviews.forEach((review) => {
 
@@ -154,23 +153,25 @@ describe('Get /api/reviews', () => {
                         })
                     );
                 });
+
+                expect(reviews).toBeSortedBy("created_at", {descending: true,})
             });
     });
 
-    test("400: response with 400 bad request error if invalid category", () => {
+    test("404: response with 404 not found error if invalid category", () => {
         return request(app)
             .get("/api/reviews?category=test&sort_by=created_at&order=DESC")
-            .expect(400)
+            .expect(404)
             .then( res => {
                 const { msg } = res.body;
-                expect(msg).toBe("Bad Request!");
+                expect(msg).toBe("Resource not found.");
                 
             });
     });
 
     test("400: response with 400 bad request error if invalid sort_by", () => {
         return request(app)
-            .get("/api/reviews?category=social_deduction&sort_by=test&order=DESC")
+            .get("/api/reviews?category=social deduction&sort_by=test&order=DESC")
             .expect(400)
             .then( res => {
                 const { msg } = res.body;
@@ -181,7 +182,7 @@ describe('Get /api/reviews', () => {
 
     test("400: response with 400 bad request error if invalid order", () => {
         return request(app)
-            .get("/api/reviews?category=social_deduction&sort_by=created_at&order=test")
+            .get("/api/reviews?category=social deduction&sort_by=created_at&order=test")
             .expect(400)
             .then( res => {
                 const { msg } = res.body;
@@ -192,7 +193,7 @@ describe('Get /api/reviews', () => {
 
     test("404: response with 404 resource not found error if valid category but no reviews", () => {
         return request(app)
-            .get("/api/reviews?category=children's_games&sort_by=created_at&order=DESC")
+            .get("/api/reviews?category=children's games&sort_by=created_at&order=DESC")
             .expect(404)
             .then( res => {
                 const { msg } = res.body;

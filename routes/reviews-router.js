@@ -7,7 +7,6 @@ reviewsRouter
         const { category, sort_by, order } = req.query; 
         getReviews(category, sort_by, order)
         .then((reviews) => {
-            //console.log(reviews)
             res.status(200).send({ reviews })
         })
         .catch(next);

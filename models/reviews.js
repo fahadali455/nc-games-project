@@ -4,8 +4,11 @@ const { getReviewsQuery } = require("../utils")
 exports.getReviews = (category, sort_by, order) => {
     let sqlQuery = getReviewsQuery(category, sort_by, order);
 
-    if(!sqlQuery){
+    if(sqlQuery === "400"){
         return Promise.reject({ status: 400, msg: "Bad Request!" });
+    }
+    else if(sqlQuery === "404"){
+        return Promise.reject({ status: 404, msg: "Resource not found." });
     }
 
     return db
