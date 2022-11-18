@@ -584,9 +584,6 @@ describe('DELETE /api/comments/:comment_id', () => {
         return request(app)
             .delete("/api/comments/1")
             .expect(204)
-            .then( res => {
-                expect(res.body).toEqual({});
-            });
     });
 
     test("400: response with bad request error if review id not integer", () => {
