@@ -16,7 +16,6 @@ exports.removeComment = (commentId) => {
             if(comment.rows.length === 0){
                 return Promise.reject({status: 404, msg: "Resource not found."})
             }
-            console.log(comment.rows)
             return comment.rows;
         });
 }
